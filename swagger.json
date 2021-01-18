@@ -1,0 +1,190 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "QFlash Public API",
+    "version": "1.0.1",
+    "description": "This is the documentation for QFlash's Public API. You can find out more about the product at [https://www.qflash.com.br/](https://www.qflash.com.br/). You can use the api key `totallyfakekey123` to authorize requests for test purposes.",
+    "contact": {
+      "email": "qflash@qflash.com.br"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "tags": [
+    {
+      "name": "cnpj",
+      "description": "Save and retrieve CNPJ information"
+    },
+    {
+      "name": "score",
+      "description": "Access to QFlash CNPJ scores (not implemented for public use yet)"
+    }
+  ],
+  "paths": {
+    "/cnpj": {
+      "post": {
+        "tags": [
+          "cnpj"
+        ],
+        "summary": "Send CNPJ information to our database",
+        "operationId": "PostCNPJ",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/cnpj"
+        },
+        "security": [
+          {
+            "api_key": [
+
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/api_response"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid CNPJ supplied"
+          }
+        }
+      }
+    },
+    "/score/{cnpj}": {
+      "get": {
+        "tags": [
+          "score"
+        ],
+        "summary": "Get QFlash score of CNPJ",
+        "description": "Returns score object",
+        "operationId": "GetScore",
+        "parameters": [
+          {
+            "name": "cnpj",
+            "in": "path",
+            "description": "CNPJ for which score will be retrieved",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "43355054000182"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/score"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid CNPJ supplied"
+          },
+          "404": {
+            "description": "CNPJ not found"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "api_key": {
+      "type": "apiKey",
+      "name": "x-api-key",
+      "in": "header"
+    }
+  },
+  "externalDocs": {
+    "description": "Find out more about QFlash",
+    "url": "https://www.qflash.com.br/"
+  },
+  "servers": [
+    {
+      "url": "https://api.qflash.com.br/v1/"
+    }
+  ],
+  "components": {
+    "requestBodies": {
+      "cnpj": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/cnpj"
+            }
+          }
+        },
+        "description": "CNPJ with any additional fields to be added to our database.",
+        "required": true
+      }
+    },
+    "schemas": {
+      "score": {
+        "type": "object",
+        "properties": {
+          "cnpj": {
+            "type": "string",
+            "example": "54202735000127"
+          },
+          "score": {
+            "type": "number",
+            "format": "float",
+            "example": 735.1
+          }
+        }
+      },
+      "cnpj": {
+        "type": "object",
+        "required": [
+          "cnpj"
+        ],
+        "properties": {
+          "cnpj": {
+            "type": "string",
+            "example": "54202735000127"
+          },
+          "additionalMetadata": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "array"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        }
+      },
+      "api_response": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
