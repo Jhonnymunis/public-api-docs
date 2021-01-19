@@ -3,7 +3,7 @@
   "info": {
     "title": "QFlash Public API",
     "version": "1.0.1",
-    "description": "This is the documentation for QFlash's Public API. You can find out more about the product at [https://www.qflash.com.br/](https://www.qflash.com.br/). You can use the api key `totallyfakekey123` to authorize requests for test purposes.",
+    "description": "This is the documentation for the QFlash Public API. You can find out more about the product at our [website](https://www.qflash.com.br/). You can use the API key `totallyfakekey123` in the `x-api-key` header to authorize requests for test purposes.",
     "contact": {
       "email": "qflash@qflash.com.br"
     },
@@ -15,11 +15,11 @@
   "tags": [
     {
       "name": "cnpj",
-      "description": "Save and retrieve CNPJ information"
+      "description": "These endpoints are used to save and retrieve CNPJ information from our databases. Integrations with partners require them to send us the desired CNPJS via POST requests with additional information they might find important to share with us."
     },
     {
       "name": "score",
-      "description": "Access to QFlash CNPJ scores (not implemented for public use yet)"
+      "description": "These endpoints grant access to QFlash CNPJ credit scores. They enable the partners to retrieve valuable information and rank the CNPJs based on our credit models (the endpoints below are not implemented for public use yet)."
     }
   ],
   "paths": {
@@ -28,14 +28,62 @@
         "tags": [
           "cnpj"
         ],
-        "summary": "Send CNPJ information to our database",
+        "summary": "POST /cnpj",
         "operationId": "PostCNPJ",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "example": "SlJ1T0hd9W3XEoyGuh8xS9su4laZAPVe2hhiSFpA"
+          }
+        ],
         "requestBody": {
-          "$ref": "#/components/requestBodies/cnpj"
+          "description": "CNPJ object with any additional field that may hold important information.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "cnpj"
+                ],
+                "properties": {
+                  "cnpj": {
+                    "type": "string",
+                    "example": "54202735000127"
+                  },
+                  "anyAdditionalFields": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "required": false
+                  }
+                }
+              }
+            }
+          }
         },
         "security": [
           {
-            "api_key": [
+            "x-api-key": [
 
             ]
           }
@@ -46,13 +94,30 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/api_response"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             }
           },
           "400": {
-            "description": "Invalid CNPJ supplied"
+            "description": "Invalid CNPJ supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errorMessage": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -62,19 +127,32 @@
         "tags": [
           "score"
         ],
-        "summary": "Get QFlash score of CNPJ",
+        "summary": "GET /score/{cnpj}",
         "description": "Returns score object",
         "operationId": "GetScore",
         "parameters": [
           {
             "name": "cnpj",
             "in": "path",
-            "description": "CNPJ for which score will be retrieved",
             "required": true,
             "schema": {
               "type": "string",
               "example": "43355054000182"
             }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "example": "SlJ1T0hd9W3XEoyGuh8xS9su4laZAPVe2hhiSFpA"
+          }
+        ],
+        "security": [
+          {
+            "x-api-key": [
+
+            ]
           }
         ],
         "responses": {
@@ -83,108 +161,92 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/score"
+                  "type": "object",
+                  "properties": {
+                    "cnpj": {
+                      "type": "string",
+                      "example": "54202735000127"
+                    },
+                    "score": {
+                      "type": "number",
+                      "format": "float",
+                      "example": 735.1
+                    },
+                    "anyAdditionalFields": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "array"
+                        },
+                        {
+                          "type": "object"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
           },
           "400": {
-            "description": "Invalid CNPJ supplied"
+            "description": "Invalid CNPJ supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errorMessage": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           },
           "404": {
-            "description": "CNPJ not found"
+            "description": "CNPJ not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errorMessage": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
     }
   },
   "securityDefinitions": {
-    "api_key": {
+    "x-api-key": {
       "type": "apiKey",
       "name": "x-api-key",
       "in": "header"
     }
   },
   "externalDocs": {
-    "description": "Find out more about QFlash",
-    "url": "https://www.qflash.com.br/"
+    "description": "Find out more.",
+    "url": "https://www.qflash.com.br/como_funciona"
   },
   "servers": [
     {
       "url": "https://api.qflash.com.br/v1/"
     }
-  ],
-  "components": {
-    "requestBodies": {
-      "cnpj": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/cnpj"
-            }
-          }
-        },
-        "description": "CNPJ with any additional fields to be added to our database.",
-        "required": true
-      }
-    },
-    "schemas": {
-      "score": {
-        "type": "object",
-        "properties": {
-          "cnpj": {
-            "type": "string",
-            "example": "54202735000127"
-          },
-          "score": {
-            "type": "number",
-            "format": "float",
-            "example": 735.1
-          }
-        }
-      },
-      "cnpj": {
-        "type": "object",
-        "required": [
-          "cnpj"
-        ],
-        "properties": {
-          "cnpj": {
-            "type": "string",
-            "example": "54202735000127"
-          },
-          "additionalMetadata": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "array"
-              },
-              {
-                "type": "object"
-              }
-            ]
-          }
-        }
-      },
-      "api_response": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string"
-          }
-        }
-      }
-    }
-  }
+  ]
 }
