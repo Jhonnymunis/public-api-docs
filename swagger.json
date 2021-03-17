@@ -18,8 +18,8 @@
       "description": "These endpoints are used to save and retrieve CNPJ information from our databases. Integrations with partners require them to send us the desired CNPJS via POST requests with additional information they might find important to share with us."
     },
     {
-      "name": "score",
-      "description": "These endpoints grant access to QFlash CNPJ credit scores. They enable the partners to retrieve valuable information and rank the CNPJs based on our credit models (the endpoints below are not implemented for public use yet)."
+      "name": "limit",
+      "description": "These endpoints grant access to QFlash CNPJ credit scores and quote limits. They enable the partners to retrieve valuable information and rank the CNPJs based on our credit models."
     }
   ],
   "paths": {
@@ -122,24 +122,15 @@
         }
       }
     },
-    "/score/{cnpj}": {
+    "/limit": {
       "get": {
         "tags": [
-          "score"
+          "limit"
         ],
-        "summary": "GET /score/{cnpj}",
-        "description": "Returns score object",
-        "operationId": "GetScore",
+        "summary": "GET /limit/",
+        "description": "Returns quote object",
+        "operationId": "GetLimit",
         "parameters": [
-          {
-            "name": "cnpj",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "example": "43355054000182"
-            }
-          },
           {
             "name": "x-api-key",
             "in": "header",
@@ -155,6 +146,25 @@
             ]
           }
         ],
+        "requestBody": {
+          "description": "CNPJ object with any additional field that may hold important information.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "cnpj"
+                ],
+                "properties": {
+                  "cnpj": {
+                    "type": "string",
+                    "example": "52.027.35/0001-27"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "successful operation",
@@ -165,9 +175,9 @@
                   "properties": {
                     "cnpj": {
                       "type": "string",
-                      "example": "54202735000127"
+                      "example": "54.202.735/0001-27"
                     },
-                    "score": {
+                    "quote": {
                       "type": "number",
                       "format": "float",
                       "example": 735.1
